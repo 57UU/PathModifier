@@ -4,4 +4,4 @@ this software aims at modifying system path at one key. For example, you do not 
 
 # Highlights
 
-published with.Net 8 AOT, which significantly reduces the release size
+published with .Net 8 AOT, which significantly reduces the release size
