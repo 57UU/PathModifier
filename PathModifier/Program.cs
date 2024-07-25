@@ -12,27 +12,29 @@ using PathModifier;
 Assets assets;
 try
 {
-    Console.WriteLine("Loading configures");
+    Console.WriteLine("Loading configurations");
     assets = Utils.loadAssets();
-    if (assets.enable_gross_move)
-    {
-        assets.download_path = assets.gross_move_floder+@"\Downloads";
-        assets.desktop_path = assets.gross_move_floder + @"\Desktop";
-        assets.document_path = assets.gross_move_floder + @"\Documents";
-        assets.music_path = assets.gross_move_floder + @"\Music";
-        assets.video_path = assets.gross_move_floder + @"\Videos";
-        assets.picture_path = assets.gross_move_floder + @"\Pictures";
-    }
+
 }
 catch (Exception e)
 {
-    Console.WriteLine("There are no existing configuration, preparing to generate");
+    if(e is JsonException)
+    {
+        PrintRed("The configuration is corrupt, press y to override/replace it");
+        PressYtoContinue();
+    }
+    else
+    {
+        Console.WriteLine("There are no existing configuration, preparing to generate");
+    }
+    
     assets = new();
     while (true)
     {
         Console.WriteLine("Do you want move all the relative folders to a new place?(y/n)");
-        var input = Console.ReadLine().ToLower();
-        if (input == "y")
+        var input = Console.ReadKey().Key;
+        Console.WriteLine();
+        if (input == ConsoleKey.Y)
         {
             assets.enable_gross_move=true;
             Console.WriteLine("Where do you want to move to?(absolute path)");
@@ -61,32 +63,30 @@ catch (Exception e)
             break;
         }
 
-        if (input == "n")
+        if (input == ConsoleKey.N)
         {
             assets.enable_gross_move = false;
             Utils.saveAssets(assets);
             Console.WriteLine($"Please Modify the {Assets.FILE_NAME},then re-run");
-            Console.WriteLine("Press any key to exit");
-            Console.ReadKey();
-            Environment.Exit(0);
-            
+            PressAnyKeyToExit();
+
         }
 
         Console.WriteLine("Please input 'y' or 'n'");
-
     }
-
-
-    
 }
-
+if (assets.enable_gross_move)
+{
+    SetPath();
+}
+Utils.saveAssets(assets);
 
 
 Console.WriteLine("Opening current registry");
-RegEdit regEdit = new RegEdit();
+RegEdit regEdit = new();
 
 
-Console.WriteLine("Inspect current windows config\n");
+Console.WriteLine("Inspect current config\n");
 
 var currentDesktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 var currentVideo = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
@@ -108,23 +108,38 @@ table.AddRow(Strings.music,currentMusic,assets.music_path);
 
 table.Write(Format.MarkDown);
 
-
-Console.Write("override those system path? ");
-Console.Write("press y to confirm (waiting for key to be pressed)");
-
-if (Console.ReadKey().Key!=ConsoleKey.Y)
+if (!assets.auto_confirm)
 {
-    Console.WriteLine("Press Any Key to Continue...");
+    Console.Write("override those system path? ");
+    Console.Write("press y to confirm (waiting for key to be pressed)");
+    PressYtoContinue();
+}
+
+
+
+try
+{
+    //init floder
+    Utils.CreateIfNotExists(assets.desktop_path);
+    Utils.CreateIfNotExists(assets.video_path);
+    Utils.CreateIfNotExists(assets.document_path);
+    Utils.CreateIfNotExists(assets.download_path);
+    Utils.CreateIfNotExists(assets.picture_path);
+    Utils.CreateIfNotExists(assets.music_path);
+}
+catch (Exception e) {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("An error occurred while inspecting those folders! ");
+    Console.Error.WriteLine(e.Message);
+    
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("Try to inspect the configuration");
+    Console.ResetColor();
+    Console.WriteLine("Exiting...");
+    Console.ReadKey();
     Environment.Exit(0);
 }
-Console.WriteLine();
-//init floder
-Utils.CreateIfNotExists(assets.desktop_path);
-Utils.CreateIfNotExists(assets.video_path);
-Utils.CreateIfNotExists(assets.document_path);
-Utils.CreateIfNotExists(assets.download_path);
-Utils.CreateIfNotExists(assets.picture_path);
-Utils.CreateIfNotExists(assets.music_path);
+
 //replace
 regEdit.ReplaceValue(currentDesktop, assets.desktop_path);
 regEdit.ReplaceValue(currentVideo, assets.video_path);
@@ -138,3 +153,35 @@ Console.WriteLine("Path modify done, you may need rebooting to apply");
 Console.ResetColor();
 
 
+PressAnyKeyToExit();
+
+void PrintRed(string text)
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine(text);
+    Console.ResetColor();
+}
+void PressAnyKeyToExit()
+{
+    Console.WriteLine("Press Any Key to Continue...");
+    Console.ReadKey();
+    Environment.Exit(0);
+}
+void PressYtoContinue()
+{
+    var key = Console.ReadKey().Key;
+    Console.WriteLine();
+    if (key != ConsoleKey.Y)
+    {
+        PressAnyKeyToExit();
+    }
+}
+void SetPath()
+{
+    assets.download_path = assets.gross_move_floder + @"\Downloads";
+    assets.desktop_path = assets.gross_move_floder + @"\Desktop";
+    assets.document_path = assets.gross_move_floder + @"\Documents";
+    assets.music_path = assets.gross_move_floder + @"\Music";
+    assets.video_path = assets.gross_move_floder + @"\Videos";
+    assets.picture_path = assets.gross_move_floder + @"\Pictures";
+}

@@ -11,6 +11,7 @@ public class Assets
 {
     public const string FILE_NAME="configuration.json";
     public bool enable_gross_move=false;
+    public bool auto_confirm = false;
     public string? gross_move_floder;
     public string? desktop_path;
     public string? video_path;
