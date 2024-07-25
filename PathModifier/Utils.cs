@@ -4,11 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+using Microsoft.Win32;
 namespace PathModifier;
 
 public static class Utils
 {
+    public static void CreateIfNotExists(string path)
+    {
+        DirectoryInfo f = new(path);
+
+        if (!f.Exists)
+        {
+            f.Create();
+        }
+    }
     public static string ReadFile(string path)
     {
         return File.ReadAllText(path,encoding:Encoding.UTF8);

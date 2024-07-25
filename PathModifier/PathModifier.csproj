@@ -9,4 +9,8 @@
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ConsoleTables" Version="2.6.1" />
+  </ItemGroup>
+
 </Project>
