@@ -1,4 +1,6 @@
 ﻿using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 namespace PathModifier;
 
 public class RegEdit
@@ -10,6 +12,7 @@ public class RegEdit
         reg1 = Registry.CurrentUser!.OpenSubKey(Strings.reg,true)!;
         reg2 = Registry.CurrentUser!.OpenSubKey(Strings.reg2,true)!;
     }
+
     public void Write(string key,string value)
     {
         reg1.SetValue(key, value);

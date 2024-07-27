@@ -13,6 +13,7 @@ Console.ForegroundColor = ConsoleColor.Cyan;
 Console.WriteLine("https://github.com/57UU/PathModifier");
 Console.ResetColor();
 
+
 Assets assets;
 try
 {
