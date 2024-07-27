@@ -1,6 +1,6 @@
 # 路径修改器
 
-一键修改桌面、文档等的系统路径。一键打开防火墙的特定端口。
+一键修改桌面、文档等的系统路径。一键打开防火墙的特定端口(与AOT不兼容)。
 
 **注意**：本软件可能需要管理员权限才能正常工作。
 
@@ -18,7 +18,7 @@
 |document_path|string?|文档路径|
 |picture_path|string?|图片路径|
 |music_path|string?|音乐路径|
-|open_port|int?|需要打开防火墙的端口号（UDP/TCP），若为null则忽略|
+|~~open_port~~|int?|需要打开防火墙的端口号（UDP/TCP），若为null则忽略|
 
 
 # 亮点
