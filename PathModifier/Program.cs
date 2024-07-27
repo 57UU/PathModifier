@@ -7,7 +7,11 @@ using Microsoft.Win32;
 using PathModifier;
 
 
-
+Console.ForegroundColor=ConsoleColor.Green;
+Console.Write("view more at ");
+Console.ForegroundColor = ConsoleColor.Cyan;
+Console.WriteLine("https://github.com/57UU/PathModifier");
+Console.ResetColor();
 
 Assets assets;
 try
@@ -82,11 +86,33 @@ if (assets.enable_gross_move)
 Utils.saveAssets(assets);
 
 
+//firewall 
+Console.WriteLine("---firewall---");
+if (assets.open_port != null)
+{
+    if (!assets.auto_confirm)
+    {
+        Console.WriteLine($"Are you sure opening firewall port {assets.open_port}?(y/other)");
+        if (!PressYtoConfirm())
+        {
+            goto firewall_done;
+        }
+    }
+    //Console.WriteLine("setting firewall port ");
+    FirewallEdit.Open(assets.open_port.Value);
+}
+else
+{
+    Console.WriteLine("open firewall port is not set, ignore");
+}
+Console.WriteLine("---firewall-done---\n");
+firewall_done:
+
 Console.WriteLine("Opening current registry");
 RegEdit regEdit = new();
 
 
-Console.WriteLine("Inspect current config\n");
+Console.WriteLine("Inspecting current config\n");
 
 var currentDesktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 var currentVideo = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
@@ -111,7 +137,7 @@ table.Write(Format.MarkDown);
 if (!assets.auto_confirm)
 {
     Console.Write("override those system path? ");
-    Console.Write("press y to confirm (waiting for key to be pressed)");
+    Console.Write("press y to confirm.");
     PressYtoContinue();
 }
 
@@ -175,6 +201,13 @@ void PressYtoContinue()
     {
         PressAnyKeyToExit();
     }
+}
+bool PressYtoConfirm()
+{
+    var key = Console.ReadKey().Key;
+    Console.WriteLine();
+    return key == ConsoleKey.Y;
+
 }
 void SetPath()
 {
